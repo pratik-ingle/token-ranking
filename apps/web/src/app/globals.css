@@ -2,34 +2,62 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+ * Design tokens. Raw palette first (paper / surface / ink / ink-2 / muted /
+ * line / focus), then the semantic names every component uses, mapped onto it.
+ */
 :root {
-  --background: oklch(0.99 0.002 247);
-  --foreground: oklch(0.21 0.02 260);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0.02 260);
-  --muted: oklch(0.965 0.005 250);
-  --muted-foreground: oklch(0.52 0.02 257);
-  --border: oklch(0.92 0.006 250);
-  --input: oklch(0.9 0.008 250);
-  --primary: oklch(0.52 0.15 158);
-  --primary-foreground: oklch(0.99 0.01 158);
-  --secondary: oklch(0.955 0.008 250);
-  --secondary-foreground: oklch(0.25 0.02 260);
-  --accent: oklch(0.955 0.02 158);
-  --accent-foreground: oklch(0.3 0.08 158);
-  --destructive: oklch(0.58 0.21 27);
-  --destructive-foreground: oklch(0.99 0 0);
-  --warning: oklch(0.75 0.15 75);
-  --ring: oklch(0.6 0.13 158);
-  --radius: 0.6rem;
-  /* Heatmap levels 0..4 */
-  --heat-0: oklch(0.93 0.006 250);
-  --heat-1: oklch(0.86 0.09 155);
-  --heat-2: oklch(0.74 0.14 155);
-  --heat-3: oklch(0.6 0.15 155);
-  --heat-4: oklch(0.46 0.13 155);
-  /* Categorical series, fixed order (validated reference palette). Colour follows
-     the entity (a source / category always gets the same slot), never its rank. */
+  --paper: #edeff5;
+  --surface: #ffffff;
+  --ink: #161a4a;
+  --ink-2: #474c78;
+  --muted-ink: #6e7398;
+  --line: #d6d9e6;
+  --focus: #3d4ad5;
+
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --muted: #e6e9f2;
+  --muted-foreground: var(--muted-ink);
+  --border: var(--line);
+  --input: var(--line);
+  --primary: var(--ink);
+  --primary-foreground: var(--paper);
+  --secondary: #e6e9f2;
+  --secondary-foreground: var(--ink);
+  --accent: #e3e6fb;
+  --accent-foreground: var(--ink);
+  --destructive: #c4302b;
+  --destructive-foreground: #ffffff;
+  --warning: #d69500;
+  --success: #0f9483;
+  --ring: var(--focus);
+
+  /* Heatmap levels 0..4 (one sequential hue). */
+  --heat-0: #e1e4f0;
+  --heat-1: #b9c1f1;
+  --heat-2: #7e8bea;
+  --heat-3: #3d4ad5;
+  --heat-4: #1c2196;
+
+  /*
+   * Category colours. Colour follows the entity: a category always gets the
+   * same colour. coding/chat/agents/image_generation come from the design;
+   * audio/embeddings/other are series-palette slots chosen with the palette
+   * validator so that, in CATEGORY_ORDER, every adjacent pair stays apart under
+   * colour-vision deficiency (ΔE ≥ 13.5) and normal vision (ΔE ≥ 21).
+   */
+  --cat-coding: #3d4ad5;
+  --cat-chat: #0f9483;
+  --cat-agents: #b0349b;
+  --cat-image_generation: #d69500;
+  --cat-audio: #008300;
+  --cat-embeddings: #2a78d6;
+  --cat-other: #e34948;
+
+  /* Categorical series (validated reference palette), used for sources. */
   --series-1: #2a78d6;
   --series-2: #eb6834;
   --series-3: #1baf7a;
@@ -38,34 +66,45 @@
   --series-6: #008300;
   --series-7: #6250d6;
   --series-8: #e34948;
-  --chart-grid: #e1e0d9;
-  --chart-axis: #898781;
-  --status-warning: #fab219;
+  --chart-grid: var(--line);
+  --chart-axis: var(--muted-ink);
+  --status-warning: #d69500;
+
+  --header-h: 60px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
-    --background: oklch(0.16 0.012 260);
-    --foreground: oklch(0.95 0.005 250);
-    --card: oklch(0.2 0.013 260);
-    --card-foreground: oklch(0.95 0.005 250);
-    --muted: oklch(0.25 0.013 260);
-    --muted-foreground: oklch(0.7 0.015 257);
-    --border: oklch(0.3 0.014 260);
-    --input: oklch(0.34 0.014 260);
-    --primary: oklch(0.7 0.15 158);
-    --primary-foreground: oklch(0.18 0.03 158);
-    --secondary: oklch(0.26 0.013 260);
-    --secondary-foreground: oklch(0.93 0.005 250);
-    --accent: oklch(0.28 0.04 158);
-    --accent-foreground: oklch(0.88 0.08 158);
-    --destructive: oklch(0.65 0.2 25);
-    --ring: oklch(0.7 0.13 158);
-    --heat-0: oklch(0.26 0.012 260);
-    --heat-1: oklch(0.38 0.07 155);
-    --heat-2: oklch(0.5 0.11 155);
-    --heat-3: oklch(0.63 0.14 155);
-    --heat-4: oklch(0.77 0.16 155);
+    --paper: #0e1031;
+    --surface: #161a47;
+    --ink: #eceefb;
+    --ink-2: #bcc0e2;
+    --muted-ink: #8e93c2;
+    --line: #2b3070;
+    --focus: #8a98f7;
+
+    --muted: #1c2052;
+    --secondary: #1c2052;
+    --accent: #232868;
+    --destructive: #f07470;
+    --destructive-foreground: #0e1031;
+    --warning: #f2be3a;
+    --success: #3ccbb6;
+
+    --heat-0: #1f2358;
+    --heat-1: #2f3c9e;
+    --heat-2: #4d5fe2;
+    --heat-3: #8a98f7;
+    --heat-4: #d2d8ff;
+
+    --cat-coding: #8190f6;
+    --cat-chat: #3ccbb6;
+    --cat-agents: #e36bcb;
+    --cat-image_generation: #f2be3a;
+    --cat-audio: #008300;
+    --cat-embeddings: #3987e5;
+    --cat-other: #e66767;
+
     --series-1: #3987e5;
     --series-2: #d95926;
     --series-3: #199e70;
@@ -74,8 +113,7 @@
     --series-6: #008300;
     --series-7: #9085e9;
     --series-8: #e66767;
-    --chart-grid: #2c2c2a;
-    --chart-axis: #898781;
+    --status-warning: #f2be3a;
   }
 }
 
@@ -97,12 +135,20 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-warning: var(--warning);
+  --color-success: var(--success);
   --color-ring: var(--ring);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-line: var(--line);
+  --color-focus: var(--focus);
+  /* Controls ~10px, panels ~14px. */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 }
 
@@ -125,6 +171,28 @@
   }
 }
 
+/* Archivo width axis: condensed for big numbers, expanded for the wordmark/names. */
+@utility font-condensed {
+  font-stretch: 68%;
+  font-weight: 700;
+}
+@utility font-expanded {
+  font-stretch: 125%;
+  font-weight: 800;
+}
+
 .tabular {
   font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
 }
