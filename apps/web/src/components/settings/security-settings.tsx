@@ -8,9 +8,11 @@ import { callApi, ClientApiError } from "@/lib/client-api";
 import { Alert } from "../ui/alert";
 import { Button } from "../ui/button";
 import { Input, Label } from "../ui/input";
+import { useToast } from "../ui/toast";
 
 export function SecuritySettings({ passkeyCount, hasPassword, hasRecoveryEmail }: { passkeyCount: number; hasPassword: boolean; hasRecoveryEmail: boolean }) {
   const router = useRouter();
+  const toast = useToast();
   const [supports, setSupports] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -23,7 +25,7 @@ export function SecuritySettings({ passkeyCount, hasPassword, hasRecoveryEmail }
     setBusy(id);
     setMsg(null);
     try {
-      setMsg({ ok: true, text: await fn() });
+      toast(await fn());
       router.refresh();
     } catch (e) {
       const text = e instanceof ClientApiError ? e.message : e instanceof Error && e.name === "NotAllowedError" ? "Passkey prompt was cancelled." : "Something went wrong.";

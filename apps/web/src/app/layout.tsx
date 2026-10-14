@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Archivo } from "next/font/google";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { ToastProvider } from "@/components/ui/toast";
 import "./globals.css";
 
 // Variable Archivo with the width axis (62–125): condensed numbers, expanded wordmark.
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={archivo.variable}>
       <body className="min-h-dvh">
+        <ToastProvider>
         <SiteHeader />
         <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
         <footer className="border-t">
@@ -27,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/onboarding" className="hover:text-foreground">Open-source collector</Link>
           </div>
         </footer>
+        </ToastProvider>
       </body>
     </html>
   );

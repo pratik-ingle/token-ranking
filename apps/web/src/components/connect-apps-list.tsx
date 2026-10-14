@@ -9,6 +9,7 @@ import { callApi, ClientApiError } from "@/lib/client-api";
 import type { CatalogEntry } from "@/lib/integrations-catalog";
 import { timeAgo } from "@/lib/utils";
 import { Button, buttonVariants } from "./ui/button";
+import { useToast } from "./ui/toast";
 
 export interface IntegrationStatus {
   id: string;
@@ -71,6 +72,7 @@ function AppRow({
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const panelId = useId();
+  const toast = useToast();
   const connected = integrations.length > 0 || recent;
   const command = entry.connect.kind === "copy" ? entry.connect.command.replace("{server}", serverFlag) : "";
 
@@ -78,6 +80,7 @@ function AppRow({
     await navigator.clipboard.writeText(command).catch(() => {});
     setCopied(true);
     setOpen(true);
+    toast("Command copied. Run it in your terminal.");
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -166,6 +169,7 @@ function StatusLine({
   showMode: boolean;
 }) {
   const router = useRouter();
+  const toast = useToast();
   const [confirming, setConfirming] = useState(false);
   const [deleteData, setDeleteData] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -185,6 +189,7 @@ function StatusLine({
     setError(null);
     try {
       await callApi(`/api/me/integrations/${i.id}${deleteData ? "?delete_data=1" : ""}`, { method: "DELETE" });
+      toast(`${name} disconnected${deleteData ? " and its data deleted" : ""}`);
       router.refresh();
     } catch (e) {
       setError(e instanceof ClientApiError ? e.message : "Could not disconnect.");

@@ -10,6 +10,7 @@ import { Alert } from "../ui/alert";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Input, Label, Select } from "../ui/input";
+import { useToast } from "../ui/toast";
 
 export interface IntegrationRow {
   id: string;
@@ -25,14 +26,16 @@ const MODE_LABEL = { local: "Collector / API", cloud: "Cloud sync", upload: "CSV
 
 export function IntegrationsSettings({ rows }: { rows: IntegrationRow[] }) {
   const router = useRouter();
+  const toast = useToast();
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function act(id: string, fn: () => Promise<unknown>) {
+  async function act(id: string, fn: () => Promise<unknown>, done?: string) {
     setBusy(id);
     setError(null);
     try {
       await fn();
+      if (done) toast(done);
       router.refresh();
     } catch (e) {
       setError(e instanceof ClientApiError ? e.message : "Something went wrong.");
@@ -63,7 +66,10 @@ export function IntegrationsSettings({ rows }: { rows: IntegrationRow[] }) {
                 </p>
               </div>
               {r.mode === "cloud" && r.has_credential && (
-                <Button size="sm" variant="outline" disabled={busy === r.id} onClick={() => act(r.id, () => callApi(`/api/me/integrations/${r.id}/sync`, { body: {} }))}>
+                <Button size="sm" variant="outline" disabled={busy === r.id} onClick={() => {
+                    toast("Sync started");
+                    void act(r.id, () => callApi(`/api/me/integrations/${r.id}/sync`, { body: {} }), "Sync finished");
+                  }}>
                   {busy === r.id ? <Loader2 className="animate-spin" /> : <RefreshCw />} Sync now
                 </Button>
               )}
@@ -75,7 +81,11 @@ export function IntegrationsSettings({ rows }: { rows: IntegrationRow[] }) {
                   const deleteData = confirm(
                     `${r.mode === "cloud" ? "Revoke and delete the stored key." : "Remove this integration."}\n\nAlso delete the usage data it uploaded? OK = delete data, Cancel = keep data.`,
                   );
-                  void act(r.id, () => callApi(`/api/me/integrations/${r.id}${deleteData ? "?delete_data=1" : ""}`, { method: "DELETE" }));
+                  void act(
+                    r.id,
+                    () => callApi(`/api/me/integrations/${r.id}${deleteData ? "?delete_data=1" : ""}`, { method: "DELETE" }),
+                    `${SOURCE_LABELS[r.source]} disconnected`,
+                  );
                 }}
               >
                 <Trash2 /> {r.mode === "cloud" ? "Revoke" : "Remove"}
@@ -91,6 +101,7 @@ export function IntegrationsSettings({ rows }: { rows: IntegrationRow[] }) {
 }
 
 function CloudKeyForm({ onDone }: { onDone: () => void }) {
+  const toast = useToast();
   const [open, setOpen] = useState(false);
   const [source, setSource] = useState<"openai_api" | "anthropic_api" | "cursor">("openai_api");
   const [key, setKey] = useState("");
@@ -119,6 +130,7 @@ function CloudKeyForm({ onDone }: { onDone: () => void }) {
             body: { source, api_key: key, email: email || undefined, team_wide: source === "cursor" ? teamWide : undefined, acknowledge_risk: true },
           });
           setKey("");
+          toast("Sync started");
           setMsg({ ok: true, text: r.status === "duplicate" ? "Connected, but this organization is already connected to another account, so it counts only once." : "Connected. The first sync is running; data appears in a minute or two." });
           onDone();
         } catch (err) {

@@ -7,9 +7,11 @@ import { callApi, ClientApiError } from "@/lib/client-api";
 import { Alert } from "../ui/alert";
 import { Button } from "../ui/button";
 import { Label, Select } from "../ui/input";
+import { useToast } from "../ui/toast";
 
 export function ProfileSettings({ visibility, timezone }: { visibility: "public" | "hidden"; timezone: string }) {
   const router = useRouter();
+  const toast = useToast();
   const [vis, setVis] = useState(visibility);
   const [tz, setTz] = useState(timezone);
   const [busy, setBusy] = useState(false);
@@ -63,7 +65,7 @@ export function ProfileSettings({ visibility, timezone }: { visibility: "public"
           setMsg(null);
           try {
             await callApi("/api/me/settings", { method: "PATCH", body: { visibility: vis, timezone: tz } });
-            setMsg({ ok: true, text: "Saved." });
+            toast("Settings saved");
             router.refresh();
           } catch (e) {
             setMsg({ ok: false, text: e instanceof ClientApiError ? e.message : "Could not save." });

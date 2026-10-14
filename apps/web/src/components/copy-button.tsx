@@ -3,9 +3,11 @@
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useToast } from "./ui/toast";
 
 export function CopyButton({ text, className, label = "Copy" }: { text: string; className?: string; label?: string }) {
   const [copied, setCopied] = useState(false);
+  const toast = useToast();
   return (
     <button
       type="button"
@@ -14,6 +16,7 @@ export function CopyButton({ text, className, label = "Copy" }: { text: string; 
       onClick={async () => {
         await navigator.clipboard.writeText(text);
         setCopied(true);
+        toast("Copied to clipboard");
         setTimeout(() => setCopied(false), 1500);
       }}
     >
