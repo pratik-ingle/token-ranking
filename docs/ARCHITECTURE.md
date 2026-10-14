@@ -108,7 +108,9 @@ There is one materialized view per window: `leaderboard_today`, `leaderboard_7d`
 - the user's top source;
 - `RANK()` over both totals (competition ranking: ties share a rank), plus the partition size for percentiles.
 
-`GROUPING SETS` produce the all-sources and all-categories rows in a single pass. `user_streaks` computes current and longest streaks in SQL (gaps-and-islands) for the streak column. `global_stats` powers the landing page.
+`GROUPING SETS` produce the all-sources and all-categories rows in a single pass. `user_streaks` computes current and longest streaks in SQL (gaps-and-islands) for the streak column. `global_stats` powers the landing page and counts the same population as the leaderboards: public users only, with flagged days and duplicate-org integrations excluded.
+
+The same views also feed the leaderboard's extra columns. `board_total_tokens` and `top_total_tokens` come from the partition in one aggregate query. Each row's category mix and source list come from one batched query over the users on the page (category rows: `source = <filter or '*'>, category <> '*'`; source rows: `category = <filter or '*'>, source <> '*'`). Every listing query joins `users` and checks `visibility = 'public'` at query time, so someone who switches to hidden disappears from lists, board totals and mixes immediately, not at the next refresh.
 
 The views are refreshed with `REFRESH … CONCURRENTLY`, which needs the unique index each view has. That happens every two minutes in the worker, and synchronously during account deletion. `ensureViews` hashes the view SQL and re-creates the views when the definition changes.
 
