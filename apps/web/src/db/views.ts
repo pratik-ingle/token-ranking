@@ -130,16 +130,26 @@ GROUP BY t.user_id, t.today;
 CREATE UNIQUE INDEX user_streaks_pk ON user_streaks (user_id);
 `;
 
+/**
+ * Site-wide totals. Same population as the leaderboards: public users only,
+ * flagged days and duplicate-org integrations excluded, so hidden users never
+ * show up in anyone's numbers.
+ */
 const GLOBAL_STATS_SQL = `
 CREATE MATERIALIZED VIEW global_stats AS
 SELECT 1 AS id,
-       coalesce(sum(input_tokens + output_tokens + cache_read_tokens + cache_write_tokens), 0)::float8 AS total_tokens,
-       coalesce(sum(input_tokens + output_tokens), 0)::float8 AS total_tokens_nocache,
-       (SELECT count(*) FROM users)::int AS user_count,
-       count(DISTINCT user_id)::int AS active_users,
+       coalesce(sum(d.input_tokens + d.output_tokens + d.cache_read_tokens + d.cache_write_tokens), 0)::float8 AS total_tokens,
+       coalesce(sum(d.input_tokens + d.output_tokens), 0)::float8 AS total_tokens_nocache,
+       (SELECT count(*) FROM users WHERE visibility = 'public')::int AS user_count,
+       count(DISTINCT d.user_id)::int AS active_users,
        now() AS refreshed_at
-FROM daily_usage
-WHERE NOT flagged;
+FROM daily_usage d
+JOIN users u ON u.id = d.user_id AND u.visibility = 'public'
+WHERE NOT d.flagged
+  AND NOT EXISTS (
+    SELECT 1 FROM integrations i
+    WHERE i.user_id = d.user_id AND i.source = d.source AND i.status = 'duplicate'
+  );
 CREATE UNIQUE INDEX global_stats_pk ON global_stats (id);
 `;
 

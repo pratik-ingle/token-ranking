@@ -1,6 +1,8 @@
 import { z } from "zod";
 import {
   CATEGORIES,
+  type Category,
+  type Source,
   MAX_COUNTER,
   MAX_MODEL_LENGTH,
   MAX_ROWS_PER_REQUEST,
@@ -124,14 +126,25 @@ export const leaderboardQuerySchema = z.object({
 });
 export type LeaderboardQuery = z.infer<typeof leaderboardQuerySchema>;
 
+export interface CategoryShare {
+  key: Category;
+  /** Fraction of the user's tokens in this category (0..1), for the current window/source/verified/cache filter. */
+  share: number;
+}
+
 export interface LeaderboardEntry {
   rank: number;
   username: string;
   total_tokens: number;
+  /** Kept for compatibility; equals sources[0]. */
   top_source: string | null;
   current_streak: number;
   /** Share of this row's tokens that came from verified (server-pulled) data, 0..1. */
   verified_share: number;
+  /** Category split of this user's tokens (current window, source filter, verified, cache), largest first. */
+  category_mix: CategoryShare[];
+  /** Sources this user has tokens from (current window, category filter, verified, cache), by tokens descending. */
+  sources: Source[];
 }
 
 export interface LeaderboardResponse {
@@ -143,8 +156,20 @@ export interface LeaderboardResponse {
   page: number;
   page_size: number;
   total_ranked: number;
+  /** Sum of the selected total (with or without cache) over everyone ranked under this filter. */
+  board_total_tokens: number;
+  /** The #1 total under this filter (for scaling bars on any page). */
+  top_total_tokens: number;
   entries: LeaderboardEntry[];
-  me: (LeaderboardEntry & { percentile_label: string; listed: boolean; page: number }) | null;
+  me:
+    | (LeaderboardEntry & {
+        percentile_label: string;
+        listed: boolean;
+        page: number;
+        /** 1-based position in listing order (rank, then username); null when not listed. */
+        position: number | null;
+      })
+    | null;
   refreshed_at: string | null;
 }
 

@@ -63,6 +63,24 @@ GET /api/v1/me/stats      (Bearer token or session)
 GET /api/v1/stats`}</pre>
       </section>
       <section className="space-y-2">
+        <h2>Leaderboard response fields</h2>
+        <p className="text-sm text-muted-foreground">
+          <code>GET /api/v1/leaderboard</code> returns the page of <code>entries</code> plus your own row in <code>me</code> when you send a token or
+          session. Fields added after v1 launched (existing fields are never removed or renamed):
+        </p>
+        <ul className="list-disc pl-5 text-sm text-muted-foreground">
+          <li><code>board_total_tokens</code>: sum of the selected total (with or without cache) over everyone ranked under this filter.</li>
+          <li><code>top_total_tokens</code>: the #1 total under this filter, handy for scaling bars on any page.</li>
+          <li><code>entries[].category_mix</code>: <code>[{"{"}key, share{"}"}]</code>, the user&apos;s category split (0–1, largest first) for the current window, source, verified and cache filters.</li>
+          <li><code>entries[].sources</code>: the sources the user has tokens from under the current category filter, by tokens descending. <code>top_source</code> equals <code>sources[0]</code>.</li>
+          <li><code>me.position</code>: your 1-based position in listing order (rank, then username), or <code>null</code> when you are hidden or not listed yet.</li>
+        </ul>
+        <p className="text-sm text-muted-foreground">
+          Hidden users never appear in entries and never count towards <code>board_total_tokens</code>, <code>top_total_tokens</code> or{" "}
+          <code>GET /api/v1/stats</code>.
+        </p>
+      </section>
+      <section className="space-y-2">
         <h2>Device login (CLI / MCP)</h2>
         <pre>{`POST /api/v1/device/code   {"client":"collector"}  → device_code, user_code, verification_uri
 POST /api/v1/device/token  {"device_code":"..."}   → access_token once approved at /device`}</pre>

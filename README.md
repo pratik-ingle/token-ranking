@@ -78,10 +78,11 @@ The command opens a device-code page, auto-detects Claude Code and Codex logs, r
 | `POST /api/v1/usage` | Bearer ingest token | Upload 1–1000 rows (bare JSON array, strict schema) |
 | `POST /api/v1/integrations/heartbeat` | Bearer | Collector registers a source and an optional org fingerprint |
 | `POST /api/v1/otlp/v1/metrics` | Bearer | Claude Code OTLP/HTTP JSON metrics (deltas) |
-| `GET /api/v1/leaderboard?window=&source=&category=&verified=&cache=&page=` | optional | Ranked list, plus your own row |
+| `GET /api/v1/leaderboard?window=&source=&category=&verified=&cache=&page=` | optional | Ranked list, plus your own row. Also returns `board_total_tokens`, `top_total_tokens`, `entries[].category_mix`, `entries[].sources` and `me.position` |
 | `GET /api/v1/users/{username}/stats` | public profiles | Totals, ranks per window, streaks, breakdowns, trend |
 | `GET /api/v1/users/{username}/heatmap?year=` | public profiles | Daily totals in the user's timezone |
 | `GET /api/v1/me`, `/api/v1/me/rank`, `/api/v1/me/stats` | Bearer or session | Your own data (also when your profile is hidden) |
+| `GET /api/v1/stats` | — | Site totals for the home page; public users only, same exclusions as the leaderboards |
 | `POST /api/v1/device/code`, `POST /api/v1/device/token` | — | Device login for the CLI and MCP server (RFC 8628) |
 | `POST /api/internal/cron?job=refresh\|sync\|cleanup` | `CRON_SECRET` | For serverless schedulers |
 
