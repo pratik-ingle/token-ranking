@@ -1,8 +1,8 @@
 "use client";
 
 import { browserSupportsWebAuthn, startAuthentication, startRegistration } from "@simplewebauthn/browser";
-import { validateUsername } from "@tokenrank/shared";
-import { Check, Fingerprint, KeyRound, Loader2, X } from "lucide-react";
+import { generateUsername, validateUsername } from "@tokenrank/shared";
+import { Check, Dices, Fingerprint, KeyRound, Loader2, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -40,6 +40,10 @@ export function SignupForm({ next }: { next?: string }) {
   const [avail, setAvail] = useState<Availability>({ state: "idle" });
 
   useEffect(() => {
+    setUsername((u) => u || generateUsername());
+  }, []);
+
+  useEffect(() => {
     const ok = browserSupportsWebAuthn();
     setPasskeys(ok);
     if (!ok) setUsePassword(true);
@@ -52,8 +56,12 @@ export function SignupForm({ next }: { next?: string }) {
     setAvail({ state: "checking" });
     const t = setTimeout(async () => {
       try {
-        const r = await callApi<{ available: boolean; message?: string }>(`/api/auth/username?u=${encodeURIComponent(username)}`);
-        setAvail(r.available ? { state: "ok", message: "Available" } : { state: "bad", message: r.message });
+        const r = await callApi<{ available: boolean; error?: string; message?: string }>(`/api/auth/username?u=${encodeURIComponent(username)}`);
+        setAvail(
+          r.available
+            ? { state: "ok", message: "Available. This is the only name anyone sees." }
+            : { state: "bad", message: r.error === "username_taken" ? "That username is taken. Try another." : r.message },
+        );
       } catch {
         setAvail({ state: "idle" });
       }
@@ -104,20 +112,26 @@ export function SignupForm({ next }: { next?: string }) {
     >
       <div className="space-y-2">
         <Label htmlFor="username">Username</Label>
-        <Input
-          id="username"
-          autoComplete="username webauthn"
-          autoCapitalize="none"
-          spellCheck={false}
-          placeholder="e.g. quiet_otter"
-          value={username}
-          maxLength={24}
-          onChange={(e) => setUsername(e.target.value.toLowerCase())}
-          required
-        />
-        <p className="flex min-h-5 items-center gap-1 text-xs text-muted-foreground" aria-live="polite">
+        <div className="flex flex-col gap-2 min-[420px]:flex-row">
+          <Input
+            id="username"
+            autoComplete="username webauthn"
+            autoCapitalize="none"
+            spellCheck={false}
+            placeholder="e.g. quiet_otter_42"
+            value={username}
+            maxLength={24}
+            aria-describedby="username-status"
+            onChange={(e) => setUsername(e.target.value.toLowerCase())}
+            required
+          />
+          <Button type="button" variant="outline" className="shrink-0" onClick={() => setUsername(generateUsername())}>
+            <Dices aria-hidden /> Generate another
+          </Button>
+        </div>
+        <p id="username-status" className="flex min-h-5 items-center gap-1 text-xs text-muted-foreground" aria-live="polite">
           {avail.state === "checking" && <Loader2 className="size-3 animate-spin" />}
-          {avail.state === "ok" && <Check className="size-3 text-primary" />}
+          {avail.state === "ok" && <Check className="size-3 text-success" />}
           {avail.state === "bad" && <X className="size-3 text-destructive" />}
           {avail.message ?? "3–24 characters: a–z, 0–9 and underscore. This is the only thing we ask for."}
         </p>
