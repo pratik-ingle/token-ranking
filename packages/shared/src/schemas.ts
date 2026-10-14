@@ -216,6 +216,15 @@ export interface UserStatsResponse {
   daily: { date: string; total_tokens: number }[];
   verified_share: number;
   flagged_days: number;
+  /** All-time busiest local day (flagged days excluded), or null with no usage. */
+  busiest_day: { date: string; total_tokens: number } | null;
+}
+
+export interface HeatmapDay {
+  date: string;
+  total_tokens: number;
+  /** Tokens per category that day (only categories with usage). */
+  by_category?: Partial<Record<Category, number>>;
 }
 
 export interface HeatmapResponse {
@@ -224,7 +233,7 @@ export interface HeatmapResponse {
   year: number | null;
   start: string;
   end: string;
-  days: { date: string; total_tokens: number }[];
+  days: HeatmapDay[];
   available_years: number[];
 }
 

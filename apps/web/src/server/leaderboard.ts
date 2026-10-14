@@ -11,6 +11,7 @@ import {
   type BreakdownItem,
   type Category,
   type CategoryShare,
+  type HeatmapDay,
   type HeatmapResponse,
   type LeaderboardEntry,
   type LeaderboardQuery,
@@ -505,6 +506,10 @@ export async function getUserStats(db: Db, user: PublicUser, opts: { cache?: boo
   const flagged = rowsOf<{ n: number | string }>(
     await db.execute(sql`SELECT count(DISTINCT (date, source))::int AS n FROM daily_usage WHERE user_id = ${user.id} AND flagged`),
   )[0];
+  const busiest = all.reduce<{ date: string; total_tokens: number } | null>(
+    (best, d) => (d.total_tokens > 0 && (!best || d.total_tokens > best.total_tokens) ? d : best),
+    null,
+  );
 
   return {
     username: user.username,
@@ -519,13 +524,33 @@ export async function getUserStats(db: Db, user: PublicUser, opts: { cache?: boo
     daily,
     verified_share: totalTokens > 0 ? Math.min(1, num(totals.verified_total) / totalTokens) : 0,
     flagged_days: num(flagged?.n),
+    busiest_day: busiest ? { date: busiest.date, total_tokens: busiest.total_tokens } : null,
   };
 }
 
 export async function getHeatmap(db: Db, user: PublicUser, year: number | null, now: Date = new Date()): Promise<HeatmapResponse> {
   const today = localDate(now, user.timezone);
   const { start, end } = heatmapRange(today, year);
-  const days = await dailyTotals(db, user.id, start, end);
+  // Per-day, per-category totals (flagged days excluded), folded into days with a by_category map.
+  const rows = rowsOf<{ date: string; category: Category; total: string | number }>(
+    await db.execute(sql`
+      SELECT date::text AS date, category::text AS category,
+             sum(input_tokens + output_tokens + cache_read_tokens + cache_write_tokens)::float8 AS total
+      FROM daily_usage
+      WHERE user_id = ${user.id} AND NOT flagged AND date >= ${start} AND date <= ${end}
+      GROUP BY date, category
+      HAVING sum(input_tokens + output_tokens + cache_read_tokens + cache_write_tokens) > 0
+      ORDER BY date`),
+  );
+  const byDay = new Map<string, HeatmapDay>();
+  for (const r of rows) {
+    const day = byDay.get(r.date) ?? { date: r.date, total_tokens: 0, by_category: {} };
+    const t = num(r.total);
+    day.total_tokens += t;
+    day.by_category![r.category] = t;
+    byDay.set(r.date, day);
+  }
+  const days = [...byDay.values()];
   const years = rowsOf<{ y: number | string }>(
     await db.execute(sql`SELECT DISTINCT extract(year FROM date)::int AS y FROM daily_usage WHERE user_id = ${user.id} AND NOT flagged ORDER BY 1 DESC`),
   ).map((r) => num(r.y));

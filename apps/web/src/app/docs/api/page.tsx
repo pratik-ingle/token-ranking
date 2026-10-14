@@ -81,6 +81,15 @@ GET /api/v1/stats`}</pre>
         </p>
       </section>
       <section className="space-y-2">
+        <h2>Profile response fields</h2>
+        <ul className="list-disc pl-5 text-sm text-muted-foreground">
+          <li><code>GET /api/v1/users/{"{username}"}/stats</code> adds <code>busiest_day</code>: <code>{`{"date":"2026-10-13","total_tokens":123}`}</code> for the
+            biggest local day (flagged days excluded), or <code>null</code>.</li>
+          <li><code>GET /api/v1/users/{"{username}"}/heatmap</code> adds <code>days[].by_category</code>, tokens per category for that day, e.g.{" "}
+            <code>{`{"coding":700,"agents":220}`}</code>. Only categories with usage are present, and they sum to <code>total_tokens</code>.</li>
+        </ul>
+      </section>
+      <section className="space-y-2">
         <h2>Device login (CLI / MCP)</h2>
         <pre>{`POST /api/v1/device/code   {"client":"collector"}  → device_code, user_code, verification_uri
 POST /api/v1/device/token  {"device_code":"..."}   → access_token once approved at /device`}</pre>

@@ -1,4 +1,4 @@
-import { chunkRows, MAX_ROWS_PER_REQUEST, type Source } from "@tokenrank/shared";
+import { addDays, chunkRows, localDate, MAX_ROWS_PER_REQUEST, type Source } from "@tokenrank/shared";
 import {
   createAnthropicIntegration,
   createCursorIntegration,
@@ -266,4 +266,24 @@ export async function listIntegrations(db: Db, userId: string): Promise<Integrat
       FROM integrations WHERE user_id = ${userId} ORDER BY source, mode`),
   );
   return rows.map((r) => ({ ...r, last_synced_at: r.last_synced_at ? new Date(r.last_synced_at).toISOString() : null }));
+}
+
+/**
+ * Sources a user counts as connected: any integration that isn't revoked
+ * (collector heartbeat, CSV upload, cloud sync, OTLP) or any usage row dated
+ * within the last `days` local days.
+ */
+export async function connectedSources(
+  db: Db,
+  user: { id: string; timezone: string },
+  opts: { now?: Date; days?: number } = {},
+): Promise<Set<Source>> {
+  const cutoff = addDays(localDate(opts.now ?? new Date(), user.timezone), -((opts.days ?? 30) - 1));
+  const rows = rowsOf<{ source: Source }>(
+    await db.execute(sql`
+      SELECT source::text AS source FROM integrations WHERE user_id = ${user.id} AND status <> 'revoked'
+      UNION
+      SELECT DISTINCT source::text FROM daily_usage WHERE user_id = ${user.id} AND date >= ${cutoff}`),
+  );
+  return new Set(rows.map((r) => r.source));
 }
