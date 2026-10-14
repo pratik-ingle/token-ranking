@@ -1,0 +1,44 @@
+{
+  "name": "tokenrank-collector",
+  "version": "0.1.0",
+  "description": "Local, auditable collector for TokenRank: reads token counts (never content) from your AI tools and uploads daily aggregates.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "tokenrank-collector": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": "./dist/index.js"
+      }
+    }
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsx src/cli.ts",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tokenrank/shared": "workspace:*",
+    "tsup": "^8.5.1",
+    "tsx": "^4.23.15"
+  }
+}

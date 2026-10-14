@@ -1,0 +1,30 @@
+{
+  "name": "tokenrank",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Privacy-first global leaderboard for AI token usage",
+  "license": "MIT",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @tokenrank/web dev",
+    "build": "pnpm -r --filter ./packages/** build && pnpm --filter @tokenrank/web build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "pnpm -r typecheck",
+    "setup:env": "pnpm --filter @tokenrank/web setup:env",
+    "db:start": "pnpm --filter @tokenrank/web db:start",
+    "db:migrate": "pnpm --filter @tokenrank/web db:migrate",
+    "db:generate": "pnpm --filter @tokenrank/web db:generate",
+    "db:seed": "pnpm --filter @tokenrank/web db:seed",
+    "worker": "pnpm --filter @tokenrank/web worker"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.11"
+  }
+}

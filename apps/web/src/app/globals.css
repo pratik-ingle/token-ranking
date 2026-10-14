@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: oklch(0.99 0.002 247);
+  --foreground: oklch(0.21 0.02 260);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.21 0.02 260);
+  --muted: oklch(0.965 0.005 250);
+  --muted-foreground: oklch(0.52 0.02 257);
+  --border: oklch(0.92 0.006 250);
+  --input: oklch(0.9 0.008 250);
+  --primary: oklch(0.52 0.15 158);
+  --primary-foreground: oklch(0.99 0.01 158);
+  --secondary: oklch(0.955 0.008 250);
+  --secondary-foreground: oklch(0.25 0.02 260);
+  --accent: oklch(0.955 0.02 158);
+  --accent-foreground: oklch(0.3 0.08 158);
+  --destructive: oklch(0.58 0.21 27);
+  --destructive-foreground: oklch(0.99 0 0);
+  --warning: oklch(0.75 0.15 75);
+  --ring: oklch(0.6 0.13 158);
+  --radius: 0.6rem;
+  /* Heatmap levels 0..4 */
+  --heat-0: oklch(0.93 0.006 250);
+  --heat-1: oklch(0.86 0.09 155);
+  --heat-2: oklch(0.74 0.14 155);
+  --heat-3: oklch(0.6 0.15 155);
+  --heat-4: oklch(0.46 0.13 155);
+  /* Categorical series, fixed order (validated reference palette). Colour follows
+     the entity (a source / category always gets the same slot), never its rank. */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+  --series-6: #008300;
+  --series-7: #6250d6;
+  --series-8: #e34948;
+  --chart-grid: #e1e0d9;
+  --chart-axis: #898781;
+  --status-warning: #fab219;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --background: oklch(0.16 0.012 260);
+    --foreground: oklch(0.95 0.005 250);
+    --card: oklch(0.2 0.013 260);
+    --card-foreground: oklch(0.95 0.005 250);
+    --muted: oklch(0.25 0.013 260);
+    --muted-foreground: oklch(0.7 0.015 257);
+    --border: oklch(0.3 0.014 260);
+    --input: oklch(0.34 0.014 260);
+    --primary: oklch(0.7 0.15 158);
+    --primary-foreground: oklch(0.18 0.03 158);
+    --secondary: oklch(0.26 0.013 260);
+    --secondary-foreground: oklch(0.93 0.005 250);
+    --accent: oklch(0.28 0.04 158);
+    --accent-foreground: oklch(0.88 0.08 158);
+    --destructive: oklch(0.65 0.2 25);
+    --ring: oklch(0.7 0.13 158);
+    --heat-0: oklch(0.26 0.012 260);
+    --heat-1: oklch(0.38 0.07 155);
+    --heat-2: oklch(0.5 0.11 155);
+    --heat-3: oklch(0.63 0.14 155);
+    --heat-4: oklch(0.77 0.16 155);
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
+    --series-5: #d55181;
+    --series-6: #008300;
+    --series-7: #9085e9;
+    --series-8: #e66767;
+    --chart-grid: #2c2c2a;
+    --chart-axis: #898781;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-warning: var(--warning);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  html {
+    color-scheme: light dark;
+  }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}

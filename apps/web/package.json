@@ -1,0 +1,48 @@
+{
+  "name": "@tokenrank/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "setup:env": "tsx scripts/setup-env.ts",
+    "db:start": "tsx scripts/db-start.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "worker": "tsx scripts/worker.ts"
+  },
+  "dependencies": {
+    "@simplewebauthn/browser": "^14.0.0",
+    "@simplewebauthn/server": "^14.0.3",
+    "@tokenrank/shared": "workspace:*",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "drizzle-orm": "^0.45.4",
+    "lucide-react": "latest",
+    "next": "^16.4.0",
+    "nodemailer": "latest",
+    "pg": "^8.23.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "recharts": "^3.10.1",
+    "tailwind-merge": "latest",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.9",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/nodemailer": "latest",
+    "@types/pg": "latest",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.11",
+    "embedded-postgres": "18.4.0-beta.17",
+    "postcss": "latest",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15"
+  }
+}
