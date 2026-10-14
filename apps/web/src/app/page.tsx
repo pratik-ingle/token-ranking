@@ -53,7 +53,7 @@ export default async function HomePage() {
               <Link href="/leaderboard" className="text-sm text-primary hover:underline">Full board →</Link>
             </CardHeader>
             <CardContent>
-              <LeaderboardTable entries={top} compact highlight={user?.username} />
+              <LeaderboardTable rows={top.map((entry) => ({ kind: "entry" as const, entry }))} compact me={user?.username} topTotal={top[0]?.total_tokens ?? 0} caption="Top 10 in the last 30 days" />
             </CardContent>
           </Card>
         </div>
