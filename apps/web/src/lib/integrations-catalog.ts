@@ -77,6 +77,15 @@ export const INTEGRATIONS: CatalogEntry[] = [
     details: ["Only claude_code.token.usage is read; identity attributes (email, account, org, session) are dropped.", "Use this or the collector for Claude Code, not both."],
   },
   {
+    id: "gemini",
+    name: "Gemini",
+    source: "gemini",
+    how: "api",
+    trust: "self-reported",
+    description: "Google Gemini usage via the generic CSV import or the ingestion API.",
+    details: ["Export or log daily token counts, then upload them as CSV or POST them with an ingest token."],
+  },
+  {
     id: "generic",
     name: "Anything else",
     source: "other",
@@ -86,3 +95,6 @@ export const INTEGRATIONS: CatalogEntry[] = [
     details: ["POST /api/v1/usage with a personal ingest token. Community connectors welcome."],
   },
 ];
+
+/** One entry per app for "Not connected" lists: skips the OTel alternative and the catch-all. */
+export const APP_ENTRIES = INTEGRATIONS.filter((i) => i.id !== "claude_code_otel" && i.id !== "generic");

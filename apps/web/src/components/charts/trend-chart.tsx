@@ -27,8 +27,8 @@ export function TrendChart({ data }: { data: Point[] }) {
         <AreaChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
           <defs>
             <linearGradient id="trendFill" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" stopColor="var(--series-1)" stopOpacity={0.25} />
-              <stop offset="100%" stopColor="var(--series-1)" stopOpacity={0.02} />
+              <stop offset="0%" stopColor="var(--focus)" stopOpacity={0.25} />
+              <stop offset="100%" stopColor="var(--focus)" stopOpacity={0.02} />
             </linearGradient>
           </defs>
           <CartesianGrid vertical={false} stroke="var(--chart-grid)" strokeWidth={1} />
@@ -51,7 +51,7 @@ export function TrendChart({ data }: { data: Point[] }) {
           <Area
             type="monotone"
             dataKey="total_tokens"
-            stroke="var(--series-1)"
+            stroke="var(--focus)"
             strokeWidth={2}
             fill="url(#trendFill)"
             activeDot={{ r: 4, stroke: "var(--card)", strokeWidth: 2 }}

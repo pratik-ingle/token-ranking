@@ -12,7 +12,7 @@ export function ModelBars({ items }: { items: BreakdownItem[] }) {
           <div className="min-w-0">
             <div className="truncate font-mono text-xs">{i.key}</div>
             <div className="mt-1 h-1.5 rounded-full bg-muted">
-              <div className="h-full rounded-full" style={{ width: `${Math.max(2, (i.total_tokens / max) * 100)}%`, background: "var(--series-1)" }} />
+              <div className="h-full rounded-full" style={{ width: `${Math.max(2, (i.total_tokens / max) * 100)}%`, background: "var(--foreground)" }} />
             </div>
           </div>
           <span className="tabular text-muted-foreground">{formatTokens(i.total_tokens)}</span>
